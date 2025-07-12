@@ -10,11 +10,6 @@
     <mapping directory="$PROJECT_DIR$/build/_deps/pico_sdk-src/lib/tinyusb" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/build/_deps/picotool-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/pico_sdk-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/pico_sdk-src/lib/btstack" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/pico_sdk-src/lib/cyw43-driver" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/pico_sdk-src/lib/lwip" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/pico_sdk-src/lib/mbedtls" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/pico_sdk-src/lib/tinyusb" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/picotool-src" vcs="Git" />
   </component>
 </project>

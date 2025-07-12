@@ -19,25 +19,25 @@ public:
     RKGReader(uint8_t *pData);
     ~RKGReader();
 
-    GCPadStatus CalcFrame(uint16_t frame);
+    GCPadStatus CalcFrame(uint32_t frame);
 
 private:
     uint8_t *YAZ1Decompress(uint8_t *pData);
     uint16_t DecompressBlock(uint8_t *src, int offset, int srcSize, uint8_t *dst,
             uint32_t uncompressedSize);
 
-    uint8_t CalcFace(uint16_t frame);
-    uint8_t CalcDir(uint16_t frame);
+    uint8_t CalcFace(uint32_t frame);
+    uint8_t CalcDir(uint32_t frame);
     uint8_t RawToStick(uint8_t raw) const;
-    DPad CalcTrick(uint16_t frame);
+    DPad CalcTrick(uint32_t frame);
 
     // Current computed frame (since sometimes we will poll the same frame multiple times)
-    uint16_t m_frameCount;
+    uint32_t m_frameCount;
 
     // The number of tuples in each data section
-    uint16_t m_faceCount;
-    uint16_t m_dirCount;
-    uint16_t m_trickCount;
+    uint32_t m_faceCount;
+    uint32_t m_dirCount;
+    uint32_t m_trickCount;
 
     // Track the start of each data section so that we don't recompute every input poll
     uint8_t *m_faceStart;
@@ -45,14 +45,14 @@ private:
     uint8_t *m_trickStart;
 
     // What is the current tuple we're looking at?
-    uint16_t m_faceIndex;
-    uint16_t m_dirIndex;
-    uint16_t m_trickIndex;
+    uint32_t m_faceIndex;
+    uint32_t m_dirIndex;
+    uint32_t m_trickIndex;
 
     // If a given tuple is x frames long, how many frames have we elapsed in this tuple so far?
-    uint8_t m_faceDuration;
-    uint8_t m_dirDuration;
-    uint16_t m_trickDuration; // may be greater than 256
+    uint32_t m_faceDuration;
+    uint32_t m_dirDuration;
+    uint32_t m_trickDuration; // may be greater than 256
 
     uint8_t *m_decodedData;
     bool m_compressed;

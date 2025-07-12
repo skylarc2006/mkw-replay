@@ -127,7 +127,7 @@ uint16_t RKGReader::DecompressBlock(uint8_t *src, int offset, int srcSize, uint8
     return srcPos;
 }
 
-uint8_t RKGReader::CalcFace(uint16_t frame) {
+uint8_t RKGReader::CalcFace(uint32_t frame) {
     // End of input?
     if (m_faceIndex >= m_faceCount) {
         return 0;
@@ -146,7 +146,7 @@ uint8_t RKGReader::CalcFace(uint16_t frame) {
     return inputs;
 }
 
-uint8_t RKGReader::CalcDir(uint16_t frame) {
+uint8_t RKGReader::CalcDir(uint32_t frame) {
     // End of input?
     if (m_dirIndex >= m_dirCount) {
         return 0;
@@ -165,7 +165,7 @@ uint8_t RKGReader::CalcDir(uint16_t frame) {
     return inputs;
 }
 
-DPad RKGReader::CalcTrick(uint16_t frame) {
+DPad RKGReader::CalcTrick(uint32_t frame) {
     // End of input?
     if (m_trickIndex >= m_trickCount) {
         return DPad::None;
@@ -219,13 +219,69 @@ uint8_t RKGReader::RawToStick(uint8_t raw) const {
     return sticks[raw];
 }
 
-GCPadStatus RKGReader::CalcFrame(uint16_t frame) {
-    constexpr bool CTGP_TAS_REPLAY_MODE = true;
+// Declare global variables to help with input loop mode
+uint16_t g_startOfLoopFrame;
+uint16_t g_startOfLoopFaceIndex;
+uint16_t g_startOfLoopDirIndex;
+uint16_t g_startOfLoopTrickIndex;
+uint16_t g_startOfLoopFaceDuration;
+uint16_t g_startOfLoopDirDuration;
+uint16_t g_startOfLoopTrickDuration;
+
+GCPadStatus RKGReader::CalcFrame(uint32_t frame) {
+    constexpr bool CTGP_TAS_REPLAY_MODE = false;
+    constexpr bool INPUT_LOOP_MODE = true;
     uint16_t FRAMES_AFTER_RECONNECT = 284; // This can vary, adjust this if needed
 
     GCPadStatus ret = s_defaultGCPadStatus;
 
-    if (CTGP_TAS_REPLAY_MODE) {
+    if (INPUT_LOOP_MODE) {
+        constexpr uint16_t START_OF_LOOP = 1;
+        constexpr uint16_t END_OF_LOOP = 1804;
+        constexpr uint16_t DURATION_OF_LOOP = END_OF_LOOP - START_OF_LOOP;
+
+        if (frame == 0) {
+            ret.a = 1;
+            return ret;
+        }
+        else if (frame < FRAMES_AFTER_RECONNECT) {
+            return ret;
+        }
+        else if (frame == START_OF_LOOP + FRAMES_AFTER_RECONNECT) {
+            // Keep record of every relevant variable to restore this state when we loop
+            g_startOfLoopFrame = m_frameCount;
+            g_startOfLoopDirIndex = m_dirIndex;
+            g_startOfLoopFaceIndex = m_faceIndex;
+            g_startOfLoopTrickIndex = m_trickIndex;
+            g_startOfLoopDirDuration = m_dirDuration;
+            g_startOfLoopFaceDuration = m_faceDuration;
+            g_startOfLoopTrickDuration = m_trickDuration;
+        }
+        else if (frame >= END_OF_LOOP + FRAMES_AFTER_RECONNECT)
+        {
+            // Keep frame in the range of the input loop
+            frame -= FRAMES_AFTER_RECONNECT;
+            frame -= START_OF_LOOP;
+            frame %= DURATION_OF_LOOP;
+            frame += FRAMES_AFTER_RECONNECT;
+            frame += START_OF_LOOP;
+
+            if (frame == START_OF_LOOP + FRAMES_AFTER_RECONNECT)
+            {
+                // Reset to the state of the first frame of the loop, successfully looping
+                m_frameCount = g_startOfLoopFrame;
+                m_dirIndex = g_startOfLoopDirIndex;
+                m_faceIndex = g_startOfLoopFaceIndex;
+                m_trickIndex = g_startOfLoopTrickIndex;
+                m_dirDuration = g_startOfLoopDirDuration;
+                m_faceDuration = g_startOfLoopFaceDuration;
+                m_trickDuration = g_startOfLoopTrickDuration;
+                frame = m_frameCount;
+            }
+        }
+    }
+
+    else if (CTGP_TAS_REPLAY_MODE) {
         constexpr uint16_t FRAME_POPUP_CTGP = 241;
         constexpr uint16_t FRAMES_END_ACTIVATION = 200;    // Frames to spam left/right to activate TAS replay mode
         FRAMES_AFTER_RECONNECT = FRAMES_END_ACTIVATION + FRAME_POPUP_CTGP + 1;

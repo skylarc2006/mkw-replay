@@ -6,8 +6,7 @@
 constexpr uint32_t GC_DATA_PIN = 28;
 
 constexpr uint32_t MICROSECONDS_IN_SECOND = 1000000;
-constexpr float FRAME_RATE = 59.94f;
-
+constexpr float FRAME_RATE = 59.939469f;
 constexpr float MICROSECONDS_PER_FRAME = MICROSECONDS_IN_SECOND / FRAME_RATE;
 
 // binary ghost data included from file.S
@@ -17,8 +16,8 @@ pio_sm_config g_config;
 uint32_t g_offset;
 
 RKGReader g_rkgReader = RKGReader(g_rkg);
-uint16_t g_frame;
-uint32_t g_time;
+uint32_t g_frame;
+uint64_t g_time;
 
 // PIO Shifts to the right by default
 // In: pushes batches of 8 shifted left, i.e we get [0x40, 0x03, rumble (the end bit is never
@@ -49,10 +48,10 @@ static void convertToPio(const uint8_t *command, const uint32_t len, uint32_t *r
 static GCPadStatus GetGCPadStatus() {
     if (g_time == 0) {
         g_frame = 0;
-        g_time = time_us_32();
+        g_time = time_us_64();
     } else {
-        uint32_t timeDiff = time_us_32() - g_time;
-        g_frame = static_cast<uint16_t>(timeDiff / MICROSECONDS_PER_FRAME);
+        uint64_t timeDiff = time_us_64() - g_time;
+        g_frame = static_cast<uint32_t>(timeDiff / MICROSECONDS_PER_FRAME);
     }
 
     return g_rkgReader.CalcFrame(g_frame);
