@@ -1,3 +1,5 @@
+This is a fork of Malleo's [mkw-replay](https://github.com/malleoz/mkw-replay) that implements using CTGP's TAS replay mode to play back TASes on CTGP, as well as the ability to loop inputs, enabling automated driving for extended periods of time.
+
 # Raspberry Pi Pico Replay Device for Mario Kart Wii
 
 This software allows for the playback of Mario Kart Wii time trial ghost data on console using a Raspberry Pi Pico and an exposed Gamecube cable dataline connected to a Wii. It's consistently reliable thanks to framecount determinism by starting a time trial race with the controller unplugged because the race pauses on the same frame each time. Plug in the microcontroller with this software and it will close the unpause the game and thereby synchronize frame timings for the race. This project is forked from [pico-rectangle](https://github.com/JulienBernard3383279/pico-rectangle) as data encoding and transmission timings are already handled. Note that not all ghost data will play back currently (see the [Input Range](#inputrange) section).
@@ -32,6 +34,9 @@ I bought stuff before I had an actual game plan, so I didn't consider that the P
 
 For easiest install, I suggest using a Unix environment since that's what I used. Specifically, I just used Ubuntu running through `wsl`.
 - `sudo apt-get install build-essential gcc-arm-none-eabi cmake -y`
+
+Alternatively, for Arch-based environments:
+- `sudo pacman -S base-devel arm-none-eabi-gcc arm-none-eabi-newlib cmake -y`
 
 ## How to Run
 

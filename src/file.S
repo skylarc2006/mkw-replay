@@ -2,4 +2,4 @@
 .balign 4
 .global g_rkg
 g_rkg:
-.incbin "../1804.rkg"
+.incbin "../LC_Demo.rkg"
